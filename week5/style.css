@@ -1,0 +1,256 @@
+/* ---------- 1. 全局重置样式 ---------- */
+/* 通配符 * 选中页面所有元素，用于重置默认样式 */
+* {
+    margin: 0;
+    /* 清除所有元素的外边距 */
+    padding: 0;
+    /* 清除所有元素的内边距 */
+    box-sizing: border-box;
+    /* 让宽度计算包含边框和内边距，更符合直觉 */
+}
+
+/* ---------- 2. 页面主体样式 ---------- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* 字体：优先使用 Segoe UI，没有则用系统默认 */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* 渐变背景：从浅紫到深紫，135度角 */
+    min-height: 100vh;
+    /* 最小高度为整个视口高度，确保背景铺满 */
+    padding: 20px;
+    /* 页面内容离边缘20像素，避免贴边 */
+}
+
+/* ---------- 3. 容器（控制最大宽度和居中） ---------- */
+.container {
+    max-width: 800px;
+    /* 内容最大宽度800px，太宽了不好看 */
+    margin: 0 auto;
+    /* 左右边距自动，实现水平居中 */
+}
+
+/* ---------- 4. 头部区域样式 ---------- */
+header {
+    background: rgba(255, 255, 255, 0.95);
+    /* 白色半透明背景，几乎不透明 */
+    padding: 30px;
+    /* 内边距30像素，让内容不贴边 */
+    border-radius: 20px;
+    /* 圆角20像素，让边角变圆润 */
+    text-align: center;
+    /* 文字水平居中 */
+    margin-bottom: 30px;
+    /* 下边距30像素，和下方内容保持距离 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    /* 阴影：向下偏移10px，模糊30px，黑色半透明 */
+}
+
+/* 头部一级标题 */
+header h1 {
+    color: #667eea;
+    /* 标题颜色：紫色（和背景渐变同色系） */
+    font-size: 2.5rem;
+    /* 字体大小：2.5倍根字号（约40px） */
+    margin-bottom: 10px;
+    /* 下边距10px，和下方文字保持距离 */
+}
+
+/* 头部段落文字 */
+header p {
+    color: #666;
+    /* 灰色文字，比黑色柔和 */
+    font-size: 1.1rem;
+    /* 字体大小稍大 */
+}
+
+/* ---------- 5. 内容卡片样式 ---------- */
+.content-card {
+    background: white;
+    /* 白色背景，突出内容 */
+    border-radius: 20px;
+    /* 圆角20像素 */
+    padding: 30px;
+    /* 内边距30像素 */
+    margin-bottom: 30px;
+    /* 下边距30像素 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    /* 阴影略浅，增加层次感 */
+}
+
+/* 卡片内的二级标题 */
+.content-card h2 {
+    color: #764ba2;
+    /* 深紫色标题 */
+    margin-bottom: 20px;
+    /* 下边距20px */
+    padding-bottom: 10px;
+    /* 下内边距10px，给下边框留空间 */
+    border-bottom: 3px solid #667eea;
+    /* 底部边框：3px实线，紫色，作为装饰线 */
+}
+
+/* ---------- 6. 任务清单列表样式 ---------- */
+.task-list {
+    list-style: none;
+    /* 去掉默认的圆点列表标记 */
+    margin-bottom: 30px;
+    /* 下边距30px，和表单保持距离 */
+}
+
+/* 每个列表项 */
+.task-list li {
+    padding: 12px 15px;
+    /* 上下12px，左右15px */
+    margin-bottom: 10px;
+    /* 下边距10px，项之间留白 */
+    background: #f8f9fa;
+    /* 浅灰色背景 */
+    border-radius: 10px;
+    /* 圆角10像素 */
+    border-left: 4px solid #667eea;
+    /* 左侧彩色边框，作为视觉标记 */
+    color: #333;
+    /* 深灰色文字 */
+}
+
+/* ---------- 7. 表单样式 ---------- */
+/* 表单项容器（每个输入框+标签的包装器） */
+.form-group {
+    margin-bottom: 20px;
+    /* 下边距20px，表单项之间留白 */
+}
+
+/* 标签文字 */
+label {
+    display: block;
+    /* 变成块级元素，独占一行 */
+    margin-bottom: 8px;
+    /* 下边距8px，和输入框保持距离 */
+    font-weight: bold;
+    /* 文字加粗 */
+    color: #555;
+    /* 中灰色 */
+}
+
+/* 输入框和文本域的共同样式 */
+input,
+textarea {
+    width: 100%;
+    /* 宽度占满父容器 */
+    padding: 12px 15px;
+    /* 内边距，让输入框更舒适 */
+    border: 2px solid #e0e0e0;
+    /* 默认浅灰色边框 */
+    border-radius: 10px;
+    /* 圆角10像素 */
+    font-size: 1rem;
+    /* 字体大小正常 */
+    transition: all 0.3s ease;
+    /* 过渡动画：所有属性变化时0.3秒平滑过渡 */
+}
+
+/* 输入框获得焦点时的样式（用户点击输入时） */
+input:focus,
+textarea:focus {
+    outline: none;
+    /* 去掉默认的蓝色外发光 */
+    border-color: #667eea;
+    /* 边框变成紫色 */
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    /* 添加浅紫色外发光 */
+}
+
+/* ---------- 8. 按钮样式 ---------- */
+button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* 渐变背景，和页面背景呼应 */
+    color: white;
+    /* 白色文字 */
+    border: none;
+    /* 去掉默认边框 */
+    padding: 14px 30px;
+    /* 内边距，让按钮更大 */
+    font-size: 1rem;
+    /* 正常字号 */
+    font-weight: bold;
+    /* 文字加粗 */
+    border-radius: 50px;
+    /* 超大圆角，变成胶囊形状 */
+    cursor: pointer;
+    /* 鼠标悬停时变成小手，提示可点击 */
+    transition: transform 0.2s, box-shadow 0.2s;
+    /* 动画：位移和阴影变化 */
+    width: 100%;
+    /* 宽度占满父容器 */
+}
+
+/* 按钮悬停效果（鼠标放上去时） */
+button:hover {
+    transform: translateY(-2px);
+    /* 向上移动2像素，产生浮起效果 */
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    /* 增强阴影，加深浮起感 */
+}
+
+/* 按钮按下效果 */
+button:active {
+    transform: translateY(0);
+    /* 回到原位 */
+}
+
+/* ---------- 9. 页脚样式 ---------- */
+footer {
+    text-align: center;
+    /* 文字居中 */
+    padding: 20px;
+    /* 内边距20px */
+    color: rgba(255, 255, 255, 0.8);
+    /* 白色半透明，比纯白柔和 */
+    font-size: 0.9rem;
+    /* 稍小字号 */
+}
+
+/* ---------- 10. Flex 居中示例（验收必选项） ---------- */
+.flex-demo {
+    display: flex;
+    /* 开启 Flex 弹性布局模式 */
+    justify-content: center;
+    /* 主轴（水平）居中 */
+    align-items: center;
+    /* 交叉轴（垂直）居中 */
+    margin-top: 20px;
+    /* 上边距20px */
+    padding: 15px;
+    /* 内边距15px */
+    background: rgba(255, 255, 255, 0.2);
+    /* 半透明白色背景 */
+    border-radius: 10px;
+    /* 圆角10像素 */
+    color: white;
+    /* 白色文字 */
+    font-size: 0.9rem;
+    /* 稍小字号 */
+}
+
+/* ---------- 11. 响应式设计（移动端适配） ---------- */
+/* 当屏幕宽度小于等于600像素时，应用以下样式 */
+@media (max-width: 600px) {
+
+    /* 手机上的标题变小一点 */
+    header h1 {
+        font-size: 1.8rem;
+        /* 从2.5rem减小到1.8rem */
+    }
+
+    /* 卡片内边距减小，节省空间 */
+    .content-card {
+        padding: 20px;
+        /* 从30px减小到20px */
+    }
+
+    /* 容器左右留白，防止内容贴边 */
+    .container {
+        padding: 0 10px;
+        /* 左右各10px内边距 */
+    }
+}
