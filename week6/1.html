@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>企业人力成本分析系统 | 成本计算 & 工资条</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        /* 主容器 - 响应式卡片布局 */
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 24px 28px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1::before {
+            content: "🏢";
+            font-size: 1.8rem;
+        }
+
+        /* 选项卡按钮组 */
+        .tab-bar {
+            display: flex;
+            gap: 12px;
+            background: white;
+            padding: 16px 28px 0 28px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #6c757d;
+            border-radius: 30px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: #eef2ff;
+            color: #1e3c72;
+        }
+
+        /* 查询区域 */
+        .query-panel {
+            background: white;
+            padding: 24px 28px;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 6px;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .btn-primary {
+            background: #1e3c72;
+            color: white;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary:hover {
+            background: #2a5298;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            border: 1px solid #ddd;
+            color: #1f2937;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* 数据管理区域 (P1) */
+        .data-manager {
+            background: #fafcff;
+            padding: 0 28px 20px 28px;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 16px 0 12px 0;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .data-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 6px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+
+        .employee-table-wrapper {
+            overflow-x: auto;
+            max-height: 260px;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #edf2f7;
+            text-align: left;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        /* 结果区域卡片 */
+        .result-area {
+            padding: 24px 28px 32px 28px;
+        }
+
+        .cost-table,
+        .wage-card-area {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #edf2f7;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .cost-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cost-table th,
+        .cost-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .cost-table th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+
+        .summary-row {
+            background: #fefce8;
+            font-weight: 600;
+        }
+
+        .wage-month-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #eef2ff;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e9ecef;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .month-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .btn-setting {
+            background: #f1f3f5;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 24px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .wage-details {
+            padding: 16px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 12px 20px;
+            background: white;
+        }
+
+        .wage-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #f0f2f5;
+            padding: 6px 0;
+            font-size: 0.9rem;
+        }
+
+        .wage-label {
+            color: #4b5563;
+        }
+
+        .wage-value {
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .no-data-message {
+            padding: 32px;
+            text-align: center;
+            color: #9ca3af;
+            background: #fef9e3;
+            border-radius: 20px;
+        }
+
+        /* 模态框设置隐藏字段 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: white;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            border-radius: 32px;
+            overflow-y: auto;
+            padding: 24px 26px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px 20px;
+            margin: 20px 0;
+        }
+
+        .field-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 680px) {
+            body {
+                padding: 10px;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .wage-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>企业人力成本分析系统</h1>
+        </div>
+        <div class="tab-bar">
+            <button class="tab-btn" data-tab="cost">📊 成本计算</button>
+            <button class="tab-btn active" data-tab="wage">🧾 工资条输出</button>
+            <button class="tab-btn" data-tab="manage">📁 员工数据管理</button>
+        </div>
+
+        <!-- 公共查询栏 -->
+        <div class="query-panel">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>员工姓名</label>
+                    <input type="text" id="employeeName" placeholder="输入员工姓名" value="张三" list="employeeNameList">
+                    <datalist id="employeeNameList"></datalist>
+                </div>
+                <div class="form-group">
+                    <label>开始年份月份</label>
+                    <input type="month" id="startMonth" value="2026-02">
+                </div>
+                <div class="form-group">
+                    <label>结束年份月份</label>
+                    <input type="month" id="endMonth" value="2026-04">
+                </div>
+                <div class="form-group">
+                    <button class="btn-primary" id="queryBtn">查询 / 生成</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据管理面板 (P1) 默认隐藏 -->
+        <div id="managePanel" style="display: none;" class="data-manager">
+            <div class="section-title">📂 员工历史工资数据管理</div>
+            <div class="data-actions">
+                <input type="file" id="csvUpload" accept=".csv" style="display: none;">
+                <button class="btn-outline" id="importCsvBtn">📤 导入 CSV</button>
+                <button class="btn-outline" id="exportExampleBtn">📄 导出示例CSV</button>
+                <button class="btn-outline" id="clearDataBtn">🗑️ 清空所有数据</button>
+            </div>
+            <div class="employee-table-wrapper">
+                <table class="data-table" id="employeeDataTable">
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>年份</th>
+                            <th>月份</th>
+                            <th>所得合计</th>
+                            <th>净收入</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center">暂无数据，请导入CSV</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="font-size:12px; color:#6c757d; margin-top: 8px;">💡 提示：支持编辑或删除单条记录 (双击单元格编辑数字)</div>
+        </div>
+
+        <!-- 结果展示区域 -->
+        <div id="resultArea" class="result-area">
+            <div id="dynamicResult">请选择功能并点击查询</div>
+        </div>
+    </div>
+
+    <!-- 字段隐藏模态框 -->
+    <div id="fieldModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>🔧 设置工资条显示字段</h3>
+                <button class="btn-secondary" id="closeModalBtn">✕</button>
+            </div>
+            <div id="modalFieldsGrid" class="field-grid"></div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelModalBtn">取消</button>
+                <button class="btn-primary" id="saveModalBtn">保存设置</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- 数据存储 ----------
+        let salaryRecords = [];     // 存储员工工资记录(符合数据模型)
+        let hiddenConfigs = [];     // {employeeName, yearMonth, hiddenFields: []}
+
+        // 辅助函数：保存到localStorage
+        function saveDataToLocal() {
+            localStorage.setItem('hr_salary_records', JSON.stringify(salaryRecords));
+            localStorage.setItem('hr_hidden_configs', JSON.stringify(hiddenConfigs));
+        }
+
+        function loadDataFromLocal() {
+            const storedRecords = localStorage.getItem('hr_salary_records');
+            if (storedRecords) salaryRecords = JSON.parse(storedRecords);
+            const storedConfigs = localStorage.getItem('hr_hidden_configs');
+            if (storedConfigs) hiddenConfigs = JSON.parse(storedConfigs);
+            updateEmployeeDatalist();
+            renderManageTable();
+        }
+
+        // 更新姓名下拉建议
+        function updateEmployeeDatalist() {
+            const names = [...new Set(salaryRecords.map(r => r.name))];
+            const datalist = document.getElementById('employeeNameList');
+            if (datalist) {
+                datalist.innerHTML = '';
+                names.forEach(n => {
+                    const opt = document.createElement('option');
+                    opt.value = n;
+                    datalist.appendChild(opt);
+                });
+            }
+        }
+
+        // 渲染管理表格
+        function renderManageTable() {
+            const tbody = document.getElementById('dataTableBody');
+            if (!tbody) return;
+            if (!salaryRecords.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">暂无数据，请导入CSV</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            salaryRecords.forEach((rec, idx) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = rec.name;
+                row.insertCell(1).innerText = rec.year;
+                row.insertCell(2).innerText = rec.month;
+                row.insertCell(3).innerText = rec.salary.totalIncome;
+                row.insertCell(4).innerText = rec.salary.netIncome;
+                const actionCell = row.insertCell(5);
+                const delBtn = document.createElement('button');
+                delBtn.innerText = '删除';
+                delBtn.className = 'btn-outline';
+                delBtn.style.fontSize = '0.7rem';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    salaryRecords.splice(idx, 1);
+                    saveDataToLocal();
+                    renderManageTable();
+                    updateEmployeeDatalist();
+                    if (document.getElementById('queryBtn')) triggerQuery();
+                };
+                actionCell.appendChild(delBtn);
+                // 双击编辑所得合计字段
+                row.addEventListener('dblclick', (e) => {
+                    if (e.target.tagName === 'TD' && e.target.cellIndex === 3) {
+                        const newVal = prompt('编辑所得合计(税前工资)数额:', rec.salary.totalIncome);
+                        if (newVal !== null && !isNaN(parseFloat(newVal))) {
+                            rec.salary.totalIncome = parseFloat(newVal);
+                            saveDataToLocal();
+                            renderManageTable();
+                            triggerQuery();
+                        }
+                    }
+                });
+            });
+        }
+
+        // 获取某员工某月份的工资记录
+        function getRecord(name, year, month) {
+            return salaryRecords.find(r => r.name === name && r.year === year && r.month === month);
+        }
+
+        // 获取年月范围内所有月份列表
+        function getMonthRange(startYM, endYM) {
+            let [sY, sM] = startYM.split('-').map(Number);
+            let [eY, eM] = endYM.split('-').map(Number);
+            let months = [];
+            let cur = new Date(sY, sM - 1);
+            let end = new Date(eY, eM - 1);
+            while (cur <= end) {
+                months.push({ year: cur.getFullYear(), month: cur.getMonth() + 1 });
+                cur.setMonth(cur.getMonth() + 1);
+            }
+            return months;
+        }
+
+        // 成本计算视图
+        function renderCostView(name, startYM, endYM) {
+            const monthsList = getMonthRange(startYM, endYM);
+            let rowsHtml = '';
+            let totalPreTax = 0, totalSsc = 0, totalHfc = 0, totalComp = 0;
+            for (let m of monthsList) {
+                const rec = getRecord(name, m.year, m.month);
+                if (!rec) {
+                    rowsHtml += `<tr><td>${m.year}-${String(m.month).padStart(2, '0')}</td><td>无成本</td><td>无成本</td><td>无成本</td><td>无成本</td></tr>`;
+                    continue;
+                }
+                const pretax = rec.salary.totalIncome;
+                const ssc = rec.salary.socialSecurityCompany;
+                const hfc = rec.salary.housingFundCompany;
+                const comp = rec.salary.compensation;
+                totalPreTax += pretax; totalSsc += ssc; totalHfc += hfc; totalComp += comp;
+                rowsHtml += `<tr><td>${m.year}-${String(m.month).padStart(2, '0')}</td><td>${pretax.toLocaleString()}</td><td>${ssc.toLocaleString()}</td><td>${hfc.toLocaleString()}</td><td>${comp.toLocaleString()}</td></tr>`;
+            }
+            return `<div class="cost-table"><table><thead><tr><th>月份</th><th>税前工资(所得合计)</th><th>社保(公司)</th><th>公积金(公司)</th><th>经济补偿金</th></tr></thead><tbody>${rowsHtml}</tbody><tfoot class="summary-row"><tr><td><strong>合计</strong></td><td><strong>${totalPreTax.toLocaleString()}</strong></td><td><strong>${totalSsc.toLocaleString()}</strong></td><td><strong>${totalHfc.toLocaleString()}</strong></td><td><strong>${totalComp.toLocaleString()}</strong></td></tr></tfoot></table></div>`;
+        }
+
+        // 获取某条工资条的隐藏字段列表
+        function getHiddenFields(name, year, month) {
+            const key = `${name}|${year}-${String(month).padStart(2, '0')}`;
+            const cfg = hiddenConfigs.find(c => `${c.employeeName}|${c.yearMonth}` === key);
+            return cfg ? cfg.hiddenFields : [];
+        }
+
+        // 根据字段映射展示所有工资项
+        function renderWageCard(rec, name, year, month) {
+            if (!rec) return `<div class="no-data-message">📭 无工资条数据</div>`;
+            const salary = rec.salary;
+            const fieldsMap = {
+                basicSalary: '基本工资', positionAllowance: '岗位津贴', dimissionDeduction: '入离职扣款',
+                salaryChangeDeduction: '工资变化扣款', leaveDeduction: '假期扣款', otherPreTaxDeduction: '其他税前扣款',
+                mealAllowance: '餐补', mealDeduction: '餐补扣款', computerAllowance: '电脑补贴',
+                otherPreTaxIncome: '其他税前应发', overtimePay: '加班费', totalIncome: '所得合计',
+                socialSecurityPersonal: '五险一金个人', incomeTax: '当月所得税', compensation: '经济补偿金',
+                otherAfterTaxDeduction: '其他税后扣款', netIncome: '净收入'
+            };
+            const hiddenSet = new Set(getHiddenFields(name, year, month));
+            let itemsHtml = '';
+            for (let [key, label] of Object.entries(fieldsMap)) {
+                if (hiddenSet.has(key)) continue;
+                let value = salary[key];
+                if (value !== undefined) {
+                    itemsHtml += `<div class="wage-item"><span class="wage-label">${label}：</span><span class="wage-value">${typeof value === 'number' ? value.toLocaleString() : value}</span></div>`;
+                }
+            }
+            return `<div class="wage-details">${itemsHtml}</div>`;
+        }
+
+        // 工资条批量输出
+        function renderWageView(name, startYM, endYM) {
+            const monthsList = getMonthRange(startYM, endYM);
+            let cardsHtml = '';
+            for (let m of monthsList) {
+                const y = m.year, mon = m.month;
+                const rec = getRecord(name, y, mon);
+                const monthTitle = `${y}年${String(mon).padStart(2, '0')}月`;
+                const wageContent = renderWageCard(rec, name, y, mon);
+                cardsHtml += `
+                <div class="wage-month-card" data-card-key="${name}|${y}-${String(mon).padStart(2, '0')}">
+                    <div class="card-header">
+                        <span class="month-title">📄 ${monthTitle} 工资条</span>
+                        <button class="btn-setting" data-name="${name}" data-year="${y}" data-month="${mon}">⚙️ 设置隐藏字段</button>
+                    </div>
+                    ${wageContent}
+                </div>
+            `;
+            }
+            return `<div class="wage-card-area" id="wageCardsContainer">${cardsHtml}</div>`;
+        }
+
+        // 根据当前激活tab刷新结果
+        let currentActiveTab = 'wage';
+
+        function triggerQuery() {
+            const empName = document.getElementById('employeeName').value.trim();
+            if (!empName) {
+                document.getElementById('dynamicResult').innerHTML = '<div class="no-data-message">⚠️ 请输入员工姓名</div>';
+                return;
+            }
+            const start = document.getElementById('startMonth').value;
+            const end = document.getElementById('endMonth').value;
+            if (!start || !end) return;
+            if (currentActiveTab === 'cost') {
+                const html = renderCostView(empName, start, end);
+                document.getElementById('dynamicResult').innerHTML = html;
+            } else if (currentActiveTab === 'wage') {
+                const html = renderWageView(empName, start, end);
+                document.getElementById('dynamicResult').innerHTML = html;
+                attachWageSettingEvents();
+            } else {
+                document.getElementById('dynamicResult').innerHTML = '<div style="padding:40px; text-align:center">📌 请点击“成本计算”或“工资条输出”查看结果</div>';
+            }
+        }
+
+        function attachWageSettingEvents() {
+            const container = document.getElementById('dynamicResult');
+            if (!container) return;
+            container.querySelectorAll('.btn-setting').forEach(btn => {
+                const handler = (e) => {
+                    const name = btn.getAttribute('data-name');
+                    const year = parseInt(btn.getAttribute('data-year'));
+                    const month = parseInt(btn.getAttribute('data-month'));
+                    openFieldModal(name, year, month);
+                };
+                btn.removeEventListener('click', btn._listener);
+                btn._listener = handler;
+                btn.addEventListener('click', handler);
+            });
+        }
+
+        let currentModalContext = { name: '', year: 0, month: 0 };
+        function openFieldModal(name, year, month) {
+            currentModalContext = { name, year, month };
+            const rec = getRecord(name, year, month);
+            if (!rec) {
+                alert('该月份无工资数据，无法设置隐藏字段');
+                return;
+            }
+            const fieldsMapForModal = {
+                basicSalary: '基本工资', positionAllowance: '岗位津贴', dimissionDeduction: '入离职扣款',
+                salaryChangeDeduction: '工资变化扣款', leaveDeduction: '假期扣款', otherPreTaxDeduction: '其他税前扣款',
+                mealAllowance: '餐补', mealDeduction: '餐补扣款', computerAllowance: '电脑补贴',
+                otherPreTaxIncome: '其他税前应发', overtimePay: '加班费', totalIncome: '所得合计',
+                socialSecurityPersonal: '五险一金个人', incomeTax: '当月所得税', compensation: '经济补偿金',
+                otherAfterTaxDeduction: '其他税后扣款', netIncome: '净收入'
+            };
+            const hiddenFields = getHiddenFields(name, year, month);
+            const modalGrid = document.getElementById('modalFieldsGrid');
+            if (modalGrid) {
+                modalGrid.innerHTML = '';
+                for (let [key, label] of Object.entries(fieldsMapForModal)) {
+                    const isChecked = !hiddenFields.includes(key);
+                    const div = document.createElement('div');
+                    div.className = 'field-check';
+                    div.innerHTML = `<input type="checkbox" value="${key}" id="chk_${key}" ${isChecked ? 'checked' : ''}> <label for="chk_${key}">${label}</label>`;
+                    modalGrid.appendChild(div);
+                }
+            }
+            document.getElementById('fieldModal').classList.add('active');
+        }
+
+        function saveModalSettings() {
+            const { name, year, month } = currentModalContext;
+            const checkboxes = document.querySelectorAll('#modalFieldsGrid input[type="checkbox"]');
+            const hidden = [];
+            checkboxes.forEach(cb => {
+                if (!cb.checked) hidden.push(cb.value);
+            });
+            const yearMonth = `${year}-${String(month).padStart(2, '0')}`;
+            const existingIdx = hiddenConfigs.findIndex(c => c.employeeName === name && c.yearMonth === yearMonth);
+            const newConfig = { employeeName: name, yearMonth: yearMonth, hiddenFields: hidden };
+            if (existingIdx !== -1) hiddenConfigs[existingIdx] = newConfig;
+            else hiddenConfigs.push(newConfig);
+            saveDataToLocal();
+            document.getElementById('fieldModal').classList.remove('active');
+            triggerQuery();
+        }
+
+        // CSV导入解析
+        function importCSV(content) {
+            const lines = content.trim().split(/\r?\n/);
+            if (lines.length < 2) return;
+            const newRecords = [];
+            for (let i = 1; i < lines.length; i++) {
+                const vals = lines[i].split(',');
+                if (vals.length < 22) continue;
+                const rec = {
+                    name: vals[0].trim(),
+                    year: parseInt(vals[1]),
+                    month: parseInt(vals[2]),
+                    salary: {
+                        basicSalary: parseFloat(vals[3]) || 0, positionAllowance: parseFloat(vals[4]) || 0,
+                        dimissionDeduction: parseFloat(vals[5]) || 0, salaryChangeDeduction: parseFloat(vals[6]) || 0,
+                        leaveDeduction: parseFloat(vals[7]) || 0, otherPreTaxDeduction: parseFloat(vals[8]) || 0,
+                        mealAllowance: parseFloat(vals[9]) || 0, mealDeduction: parseFloat(vals[10]) || 0,
+                        computerAllowance: parseFloat(vals[11]) || 0, otherPreTaxIncome: parseFloat(vals[12]) || 0,
+                        overtimePay: parseFloat(vals[13]) || 0, totalIncome: parseFloat(vals[14]) || 0,
+                        socialSecurityPersonal: parseFloat(vals[15]) || 0, incomeTax: parseFloat(vals[16]) || 0,
+                        compensation: parseFloat(vals[17]) || 0, otherAfterTaxDeduction: parseFloat(vals[18]) || 0,
+                        netIncome: parseFloat(vals[19]) || 0, socialSecurityCompany: parseFloat(vals[20]) || 0,
+                        housingFundCompany: parseFloat(vals[21]) || 0
+                    }
+                };
+                newRecords.push(rec);
+            }
+            if (newRecords.length) {
+                salaryRecords.push(...newRecords);
+                saveDataToLocal();
+                renderManageTable();
+                updateEmployeeDatalist();
+                triggerQuery();
+            }
+        }
+
+        function exportExampleCSV() {
+            const sampleData = `员工姓名,年份,月份,基本工资,岗位津贴,入离职扣款,工资变化扣款,假期扣款,其他税前扣款,餐补,餐补扣款,电脑补贴,其他税前应发,加班费,所得合计,五险一金个人部分,当月所得税,经济补偿金,其他税后扣款,净收入,社保公司部分,公积金公司部分
+张三,2026,2,10000,2000,0,0,0,0,500,0,200,0,500,13200,2500,500,0,0,10200,1500,1200
+张三,2026,3,10000,2000,0,0,0,0,500,0,200,0,500,13200,2500,500,0,0,10200,1500,1200
+李四,2026,2,12000,3000,0,0,200,0,600,0,300,0,400,15900,3000,600,0,0,12300,1800,1500`;
+            const blob = new Blob([sampleData], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'payroll_sample.csv';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // 初始化演示数据
+        function initDemoData() {
+            if (salaryRecords.length === 0) {
+                const baseSalary = {
+                    basicSalary: 10000, positionAllowance: 2000, dimissionDeduction: 0, salaryChangeDeduction: 0,
+                    leaveDeduction: 0, otherPreTaxDeduction: 0, mealAllowance: 500, mealDeduction: 0,
+                    computerAllowance: 200, otherPreTaxIncome: 0, overtimePay: 500, totalIncome: 13200,
+                    socialSecurityPersonal: 2500, incomeTax: 500, compensation: 0, otherAfterTaxDeduction: 0,
+                    netIncome: 10200, socialSecurityCompany: 1500, housingFundCompany: 1200
+                };
+                salaryRecords = [
+                    { name: "张三", year: 2026, month: 2, salary: { ...baseSalary } },
+                    { name: "张三", year: 2026, month: 3, salary: { ...baseSalary } },
+                    { name: "张三", year: 2026, month: 4, salary: { ...baseSalary } }
+                ];
+                saveDataToLocal();
+            }
+        }
+
+        // 入口初始化
+        function init() {
+            loadDataFromLocal();
+            initDemoData();
+            renderManageTable();
+            updateEmployeeDatalist();
+            triggerQuery();  // 默认显示工资条
+
+            // 选项卡切换
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const tab = btn.getAttribute('data-tab');
+                    const managePanel = document.getElementById('managePanel');
+                    if (managePanel) managePanel.style.display = tab === 'manage' ? 'block' : 'none';
+                    currentActiveTab = (tab === 'cost' ? 'cost' : (tab === 'wage' ? 'wage' : 'manage'));
+                    if (currentActiveTab !== 'manage') triggerQuery();
+                    else document.getElementById('dynamicResult').innerHTML = '<div style="padding:32px;text-align:center">📊 切换到数据管理，请导入或编辑数据</div>';
+                });
+            });
+
+            document.getElementById('queryBtn').addEventListener('click', triggerQuery);
+            document.getElementById('importCsvBtn').addEventListener('click', () => document.getElementById('csvUpload').click());
+            document.getElementById('csvUpload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = ev => { importCSV(ev.target.result); e.target.value = ''; };
+                    reader.readAsText(file, 'UTF-8');
+                }
+            });
+            document.getElementById('exportExampleBtn').addEventListener('click', exportExampleCSV);
+            document.getElementById('clearDataBtn').addEventListener('click', () => {
+                if (confirm('清空所有工资数据和隐藏配置？不可撤销')) {
+                    salaryRecords = [];
+                    hiddenConfigs = [];
+                    saveDataToLocal();
+                    renderManageTable();
+                    updateEmployeeDatalist();
+                    triggerQuery();
+                }
+            });
+
+            const modal = document.getElementById('fieldModal');
+            const closeModal = () => modal.classList.remove('active');
+            document.getElementById('closeModalBtn')?.addEventListener('click', closeModal);
+            document.getElementById('cancelModalBtn')?.addEventListener('click', closeModal);
+            document.getElementById('saveModalBtn')?.addEventListener('click', saveModalSettings);
+            modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
